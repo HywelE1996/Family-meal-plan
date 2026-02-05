@@ -55,6 +55,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .tab-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:var(--sans);font-size:.78rem;font-weight:600;padding:8px 16px;border-radius:100px;cursor:pointer;transition:all .2s}
 .tab-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--pink-lt)}
 .tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--pink));border-color:var(--accent);color:#fff}
+.sync-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:1rem;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:8px;transition:all .2s}
+.sync-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-lt)}
 
 /* Main */
 .main{max-width:1000px;margin:0 auto;padding:32px 24px 80px}
@@ -76,10 +78,60 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .cal-meal-name{font-size:.72rem;font-weight:600;color:var(--text);line-height:1.3}
 .cal-swap{position:absolute;top:4px;right:4px;background:var(--bg-warm);border:none;border-radius:6px;width:20px;height:20px;cursor:pointer;font-size:.6rem;opacity:.5;display:flex;align-items:center;justify-content:center}
 .cal-swap:hover{opacity:1;background:var(--accent);color:#fff}
+.cal-add-pudding{background:var(--pink-lt);border:1px dashed var(--accent);border-radius:6px;padding:2px 6px;font-size:.6rem;cursor:pointer;margin-top:4px;color:var(--accent);font-weight:600}
+.cal-add-pudding:hover{background:var(--accent);color:#fff;border-style:solid}
+.cal-pudding{background:var(--pink-lt);border-radius:6px;padding:2px 6px;font-size:.58rem;margin-top:4px;color:var(--accent);font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-pudding:hover{background:var(--accent);color:#fff}
 .cal-actions{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .regen-btn{background:var(--accent);color:#fff;border:none;font-family:var(--sans);font-size:.82rem;font-weight:600;padding:10px 20px;border-radius:100px;cursor:pointer}
 .regen-btn:hover{background:var(--accent-hover)}
 .cal-hint{font-size:.78rem;color:var(--light)}
+
+/* Mobile responsiveness */
+@media(max-width:768px){
+  .hero{padding:32px 16px 24px}
+  .hero h1{font-size:1.8rem}
+  .badge,.cycle-badge{font-size:10px;padding:4px 12px}
+  .tabs{padding:8px 12px}
+  .tabs-inner{gap:4px}
+  .tab-btn{font-size:.7rem;padding:6px 10px}
+  .main{padding:20px 12px 60px}
+  .cal-grid{gap:2px}
+  .cal-cell{padding:4px;min-height:70px;border-radius:8px}
+  .cal-day{font-size:.6rem}
+  .cal-cat{font-size:.5rem;letter-spacing:0}
+  .cal-meal-name{font-size:.6rem}
+  .cal-swap{width:16px;height:16px;font-size:.5rem;top:2px;right:2px}
+  .cal-add-pudding{font-size:.5rem;padding:1px 4px}
+  .cal-pudding{font-size:.5rem;padding:1px 4px}
+  .fav-cal{font-size:.6rem}
+  .card-grid{grid-template-columns:1fr}
+  .meal-card{padding:14px}
+  .mini-card{padding:12px}
+  .modal{margin:10px;max-width:calc(100vw - 20px)}
+  .modal-head{padding:20px 16px}
+  .modal-title{font-size:1.3rem}
+  .modal-body{padding:20px 16px}
+  .shop-total-banner{padding:16px;flex-direction:column;text-align:center}
+  .shop-compare{justify-content:center}
+  .store-bar{justify-content:center}
+  .store-btn{font-size:.7rem;padding:6px 12px}
+  .shop-meals{grid-template-columns:1fr 1fr}
+  .db-search{width:100%}
+  .db-filters{gap:4px}
+  .db-filter-btn{font-size:.7rem;padding:4px 10px}
+}
+@media(max-width:480px){
+  .tab-btn{font-size:.65rem;padding:5px 8px}
+  .cal-dow{font-size:.6rem;padding:4px 0}
+  .cal-cell{min-height:60px}
+  .cal-meal-name{display:none}
+  .cal-add-pudding,.cal-pudding{display:none}
+  .shop-meals{grid-template-columns:1fr}
+  .shop-compare-card{min-width:70px;padding:8px 10px}
+  .shop-compare-name{font-size:.6rem}
+  .shop-compare-price{font-size:.95rem}
+}
 
 /* Card grid (shared for this-cycle & recipes) */
 .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
@@ -263,6 +315,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
     <button class="tab-btn" data-tab="shopping">🛒 Shopping</button>
     <button class="tab-btn" data-tab="recipes">📚 All Recipes</button>
     <button class="tab-btn" data-tab="favourites">❤️ Favourites</button>
+    <button class="sync-btn" onclick="openSyncModal()" title="Sync across devices">🔄</button>
   </div>
 </nav>
 
@@ -619,37 +672,37 @@ const R=[
 {id:327,meal:"Cheese Ploughman's",cat:"Quick",time:"10 mins",diff:"Easy",desc:"Cheese-focused ploughman's lunch.",ingredients:["300g mixed cheeses","Crusty bread","Pickle","Celery","Apple"],steps:["Arrange cheeses with accompaniments.","Serve with fresh bread."],tip:"Let your daughter pick what she likes."},
 {id:328,meal:"Cheese Scone",cat:"Quick",time:"25 mins",diff:"Easy",desc:"Warm cheese scones with butter.",ingredients:["225g flour","1 tsp baking powder","50g butter","100g cheddar","150ml milk"],steps:["Rub butter into flour.","Add cheese and milk. Shape.","Bake 220°C 12 mins."],tip:"Warm from the oven with butter - irresistible!"},
 {id:329,meal:"Soda Bread",cat:"Quick",time:"40 mins",diff:"Easy",desc:"Quick Irish soda bread - no yeast needed.",ingredients:["450g flour","1 tsp bicarbonate of soda","400ml buttermilk","Pinch salt"],steps:["Mix dry ingredients. Add buttermilk.","Shape into round. Score top.","Bake 200°C 30 mins."],tip:"Fresh bread that toddlers can help make!"},
-{id:330,meal:"Victoria Sponge",cat:"Quick",time:"35 mins",diff:"Easy",desc:"Classic British sponge cake with jam and cream.",ingredients:["200g butter","200g sugar","4 eggs","200g flour","Jam","Cream"],steps:["Cream butter and sugar. Add eggs and flour.","Bake in 2 tins 25 mins.","Fill with jam and cream."],tip:"A special treat for celebrations!"},
-{id:331,meal:"Scones with Jam & Cream",cat:"Quick",time:"25 mins",diff:"Easy",desc:"Classic afternoon tea scones.",ingredients:["225g flour","1 tsp baking powder","50g butter","25g sugar","150ml milk","Jam","Clotted cream"],steps:["Make scone dough. Shape and bake 12 mins.","Serve warm with jam and cream."],tip:"Cream or jam first? Your daughter decides!"},
-{id:332,meal:"Bread & Butter Pudding",cat:"Comfort",time:"50 mins",diff:"Easy",desc:"Classic British dessert with custard.",ingredients:["8 slices bread","50g butter","75g raisins","400ml custard","2 eggs","Cinnamon"],steps:["Butter bread, layer with raisins.","Pour over custard mixed with eggs.","Bake 180°C 35 mins."],tip:"Soft, custardy, and perfect for little ones."},
-{id:333,meal:"Rice Pudding",cat:"Comfort",time:"1.5 hrs",diff:"Easy",desc:"Creamy baked rice pudding.",ingredients:["100g pudding rice","50g sugar","850ml milk","Knob of butter","Nutmeg"],steps:["Put rice, sugar, milk in dish.","Dot with butter, grate nutmeg.","Bake 150°C 1.5 hrs."],tip:"Creamy comfort food toddlers love."},
-{id:334,meal:"Treacle Sponge",cat:"Comfort",time:"45 mins",diff:"Easy",desc:"Steamed sponge pudding with golden syrup.",ingredients:["100g butter","100g sugar","2 eggs","100g flour","4 tbsp golden syrup","Custard"],steps:["Cream butter and sugar. Add eggs and flour.","Put syrup in basin, add mixture.","Steam 1.5 hrs. Serve with custard."],tip:"A warming winter pudding."},
-{id:335,meal:"Jam Roly-Poly",cat:"Comfort",time:"50 mins",diff:"Easy",desc:"Rolled suet pudding with jam.",ingredients:["225g flour","100g suet","Water","Jam","Custard"],steps:["Mix flour, suet, water to dough.","Roll out, spread jam, roll up.","Bake 200°C 40 mins. Serve with custard."],tip:"Sweet jammy pudding with custard."},
-{id:336,meal:"Spotted Dick",cat:"Comfort",time:"1.5 hrs",diff:"Easy",desc:"Traditional suet pudding with currants.",ingredients:["175g flour","75g suet","75g sugar","75g currants","Milk","Custard"],steps:["Mix dry ingredients. Add milk.","Shape into log. Steam 1.5 hrs.","Serve with custard."],tip:"A funny name that kids love!"},
+{id:330,meal:"Victoria Sponge",cat:"Pudding",time:"35 mins",diff:"Easy",desc:"Classic British sponge cake with jam and cream.",ingredients:["200g butter","200g sugar","4 eggs","200g flour","Jam","Cream"],steps:["Cream butter and sugar. Add eggs and flour.","Bake in 2 tins 25 mins.","Fill with jam and cream."],tip:"A special treat for celebrations!"},
+{id:331,meal:"Scones with Jam & Cream",cat:"Pudding",time:"25 mins",diff:"Easy",desc:"Classic afternoon tea scones.",ingredients:["225g flour","1 tsp baking powder","50g butter","25g sugar","150ml milk","Jam","Clotted cream"],steps:["Make scone dough. Shape and bake 12 mins.","Serve warm with jam and cream."],tip:"Cream or jam first? Your daughter decides!"},
+{id:332,meal:"Bread & Butter Pudding",cat:"Pudding",time:"50 mins",diff:"Easy",desc:"Classic British dessert with custard.",ingredients:["8 slices bread","50g butter","75g raisins","400ml custard","2 eggs","Cinnamon"],steps:["Butter bread, layer with raisins.","Pour over custard mixed with eggs.","Bake 180°C 35 mins."],tip:"Soft, custardy, and perfect for little ones."},
+{id:333,meal:"Rice Pudding",cat:"Pudding",time:"1.5 hrs",diff:"Easy",desc:"Creamy baked rice pudding.",ingredients:["100g pudding rice","50g sugar","850ml milk","Knob of butter","Nutmeg"],steps:["Put rice, sugar, milk in dish.","Dot with butter, grate nutmeg.","Bake 150°C 1.5 hrs."],tip:"Creamy comfort food toddlers love."},
+{id:334,meal:"Treacle Sponge",cat:"Pudding",time:"45 mins",diff:"Easy",desc:"Steamed sponge pudding with golden syrup.",ingredients:["100g butter","100g sugar","2 eggs","100g flour","4 tbsp golden syrup","Custard"],steps:["Cream butter and sugar. Add eggs and flour.","Put syrup in basin, add mixture.","Steam 1.5 hrs. Serve with custard."],tip:"A warming winter pudding."},
+{id:335,meal:"Jam Roly-Poly",cat:"Pudding",time:"50 mins",diff:"Easy",desc:"Rolled suet pudding with jam.",ingredients:["225g flour","100g suet","Water","Jam","Custard"],steps:["Mix flour, suet, water to dough.","Roll out, spread jam, roll up.","Bake 200°C 40 mins. Serve with custard."],tip:"Sweet jammy pudding with custard."},
+{id:336,meal:"Spotted Dick",cat:"Pudding",time:"1.5 hrs",diff:"Easy",desc:"Traditional suet pudding with currants.",ingredients:["175g flour","75g suet","75g sugar","75g currants","Milk","Custard"],steps:["Mix dry ingredients. Add milk.","Shape into log. Steam 1.5 hrs.","Serve with custard."],tip:"A funny name that kids love!"},
 {id:337,meal:"Hawaiian Poke Bowl",cat:"World",time:"15 mins",diff:"Easy",desc:"Fresh marinated fish over rice with avocado and edamame.",ingredients:["300g sushi-grade salmon, cubed","3 tbsp soy sauce","1 tbsp sesame oil","Rice","Avocado","Edamame","Cucumber","Sesame seeds","Spring onions","Pickled ginger"],steps:["Cook rice.","Toss salmon in soy and sesame oil.","Build bowls: rice, salmon, avocado, edamame, cucumber.","Top with sesame seeds and pickled ginger."],tip:"Use very fresh fish. Small cubes of salmon are easy for toddlers."},
-{id:338,meal:"Apple Crumble",cat:"Comfort",time:"45 mins",diff:"Easy",desc:"Classic British pudding with custard.",ingredients:["4 Bramley apples","100g sugar","For crumble: 175g flour, 75g butter, 75g sugar","Custard"],steps:["Stew apples with sugar.","Make crumble topping.","Bake 180°C 30 mins. Serve with custard."],tip:"Soft apples under crunchy topping - always a hit."},
+{id:338,meal:"Apple Crumble",cat:"Pudding",time:"45 mins",diff:"Easy",desc:"Classic British pudding with custard.",ingredients:["4 Bramley apples","100g sugar","For crumble: 175g flour, 75g butter, 75g sugar","Custard"],steps:["Stew apples with sugar.","Make crumble topping.","Bake 180°C 30 mins. Serve with custard."],tip:"Soft apples under crunchy topping - always a hit."},
 {id:339,meal:"Indian Chicken 65",cat:"World",time:"25 mins",diff:"Easy",desc:"Crispy spiced fried chicken from Chennai — South India's favourite snack.",ingredients:["2 chicken breasts, cubed","Yoghurt","1 tsp chilli powder (or paprika for mild)","1 tsp garam masala","Turmeric","Ginger","Garlic","Cornflour","Curry leaves","Oil","Rice","Raita"],steps:["Marinate chicken in yoghurt, spices, garlic, ginger, cornflour 15 mins.","Deep or shallow fry until crispy 5 mins.","Toss with curry leaves.","Serve with rice and raita."],tip:"Use paprika for mild version. Crispy chicken pieces are great finger food."},
-{id:340,meal:"Rhubarb Crumble",cat:"Comfort",time:"45 mins",diff:"Easy",desc:"Tangy rhubarb with sweet crumble topping.",ingredients:["500g rhubarb","150g sugar","Crumble topping","Custard"],steps:["Chop rhubarb, mix with sugar.","Top with crumble.","Bake 180°C 30 mins."],tip:"The tartness mellows when baked with sugar."},
-{id:341,meal:"Fruit Crumble",cat:"Comfort",time:"45 mins",diff:"Easy",desc:"Seasonal fruit with buttery crumble.",ingredients:["500g mixed fruit","100g sugar","Crumble topping","Custard or ice cream"],steps:["Prepare fruit. Top with crumble.","Bake 180°C 30 mins."],tip:"Use whatever soft fruit is in season."},
-{id:342,meal:"Eton Mess",cat:"Quick",time:"10 mins",diff:"Easy",desc:"Crushed meringue with cream and strawberries.",ingredients:["4 meringue nests","300ml double cream","300g strawberries"],steps:["Whip cream. Hull and chop strawberries.","Crush meringues. Fold together."],tip:"Sweet and fun for toddlers - a bit messy!"},
+{id:340,meal:"Rhubarb Crumble",cat:"Pudding",time:"45 mins",diff:"Easy",desc:"Tangy rhubarb with sweet crumble topping.",ingredients:["500g rhubarb","150g sugar","Crumble topping","Custard"],steps:["Chop rhubarb, mix with sugar.","Top with crumble.","Bake 180°C 30 mins."],tip:"The tartness mellows when baked with sugar."},
+{id:341,meal:"Fruit Crumble",cat:"Pudding",time:"45 mins",diff:"Easy",desc:"Seasonal fruit with buttery crumble.",ingredients:["500g mixed fruit","100g sugar","Crumble topping","Custard or ice cream"],steps:["Prepare fruit. Top with crumble.","Bake 180°C 30 mins."],tip:"Use whatever soft fruit is in season."},
+{id:342,meal:"Eton Mess",cat:"Pudding",time:"10 mins",diff:"Easy",desc:"Crushed meringue with cream and strawberries.",ingredients:["4 meringue nests","300ml double cream","300g strawberries"],steps:["Whip cream. Hull and chop strawberries.","Crush meringues. Fold together."],tip:"Sweet and fun for toddlers - a bit messy!"},
 {id:343,meal:"Greek Souvlaki",cat:"World",time:"20 mins",diff:"Easy",desc:"Grilled marinated pork skewers in pitta with tzatziki — Greek street food.",ingredients:["500g pork shoulder, cubed","Oregano","Lemon","Garlic","Oil","Pitta breads","Tzatziki","Tomato","Onion","Chips"],steps:["Marinate pork in oregano, lemon, garlic, oil.","Thread onto skewers. Grill 4 mins per side.","Serve in warm pitta with tzatziki, tomato, onion and chips."],tip:"Remove from skewers. Cut pork small for your daughter."},
-{id:344,meal:"Trifle",cat:"Comfort",time:"20 mins",diff:"Easy",desc:"Classic British layered dessert.",ingredients:["1 Swiss roll or sponge fingers","400g fruit","500ml custard","300ml cream","Hundreds and thousands"],steps:["Layer sponge, fruit, custard in dish.","Top with whipped cream and sprinkles."],tip:"The layers make it fun for toddlers to eat."},
+{id:344,meal:"Trifle",cat:"Pudding",time:"20 mins",diff:"Easy",desc:"Classic British layered dessert.",ingredients:["1 Swiss roll or sponge fingers","400g fruit","500ml custard","300ml cream","Hundreds and thousands"],steps:["Layer sponge, fruit, custard in dish.","Top with whipped cream and sprinkles."],tip:"The layers make it fun for toddlers to eat."},
 {id:345,meal:"Cornish Pasty",cat:"World",time:"50 mins",diff:"Medium",desc:"The classic British handheld pie — beef, potato, swede and onion.",ingredients:["Shortcrust pastry","300g beef skirt, diced very small","1 potato, diced small","½ swede, diced small","1 onion, diced","Butter","Salt & pepper","Egg wash"],steps:["Mix beef, potato, swede, onion, seasoning.","Roll pastry into circles. Fill one half with mixture. Dot with butter.","Fold over. Crimp edges. Brush with egg.","Bake 200°C 40 mins (cover top if browning too fast)."],tip:"The ultimate handheld meal — a British classic. Cut open to cool for your daughter."},
 {id:346,meal:"Indian Murgh Makhani",cat:"World",time:"30 mins",diff:"Easy",desc:"The original butter chicken — smoky tandoori chicken in creamy tomato sauce.",ingredients:["2 chicken breasts","Yoghurt","Tandoori paste","Sauce: butter, garlic, ginger, tin tomatoes, cream, sugar, garam masala, fenugreek leaves","Rice","Naan"],steps:["Marinate chicken in yoghurt and tandoori paste. Grill or bake 15 mins.","Make sauce: cook garlic, ginger in butter. Add tomatoes 10 mins. Blend. Add cream, sugar, garam masala, fenugreek.","Slice chicken. Add to sauce.","Serve with rice and naan."],tip:"The world's most popular curry. Naturally mild and creamy. Perfect for toddlers."},
-{id:347,meal:"Sticky Toffee Pudding",cat:"Comfort",time:"45 mins",diff:"Medium",desc:"Rich date sponge with toffee sauce.",ingredients:["200g dates","175g flour","175g sugar","2 eggs","Toffee sauce","Ice cream"],steps:["Soak dates in hot water. Make sponge batter.","Bake 180°C 30 mins.","Serve warm with toffee sauce."],tip:"Very sweet - a small portion for your daughter."},
-{id:348,meal:"Banoffee Pie",cat:"Comfort",time:"20 mins",diff:"Easy",desc:"Banana and toffee pie with cream.",ingredients:["1 biscuit base","397g tin caramel","3 bananas","300ml cream","Chocolate shavings"],steps:["Spread caramel on base.","Top with sliced bananas and cream.","Dust with chocolate."],tip:"Sweet and creamy - toddler heaven!"},
-{id:349,meal:"Lemon Drizzle Cake",cat:"Quick",time:"40 mins",diff:"Easy",desc:"Moist lemon cake with crunchy lemon topping.",ingredients:["175g butter","175g sugar","3 eggs","175g flour","2 lemons"],steps:["Make sponge batter. Bake 180°C 30 mins.","Drizzle lemon syrup over hot cake."],tip:"The zingy lemon flavour is refreshing."},
-{id:350,meal:"Carrot Cake",cat:"Quick",time:"50 mins",diff:"Easy",desc:"Moist spiced carrot cake with cream cheese frosting.",ingredients:["200g carrots, grated","200g sugar","200ml oil","3 eggs","200g flour","Cream cheese frosting"],steps:["Mix wet ingredients. Fold in dry and carrots.","Bake 180°C 40 mins.","Top with frosting."],tip:"A sneaky way to get carrots into toddlers!"},
-{id:351,meal:"Fairy Cakes",cat:"Quick",time:"25 mins",diff:"Easy",desc:"Little cupcakes with buttercream icing.",ingredients:["100g butter","100g sugar","2 eggs","100g flour","Buttercream","Sprinkles"],steps:["Cream butter and sugar. Add eggs and flour.","Bake in cases 15 mins.","Top with buttercream and sprinkles."],tip:"Perfect for little hands and baking together."},
-{id:352,meal:"Flapjacks",cat:"Quick",time:"30 mins",diff:"Easy",desc:"Chewy oat bars with golden syrup.",ingredients:["150g butter","150g sugar","2 tbsp golden syrup","300g oats"],steps:["Melt butter, sugar, syrup.","Mix in oats. Press into tin.","Bake 180°C 20 mins. Cut while warm."],tip:"Chewy and sweet - a great snack."},
-{id:353,meal:"Shortbread",cat:"Quick",time:"35 mins",diff:"Easy",desc:"Buttery Scottish biscuits.",ingredients:["200g butter","100g sugar","300g flour"],steps:["Cream butter and sugar. Add flour.","Press into tin. Prick with fork.","Bake 160°C 25 mins."],tip:"Melt-in-the-mouth biscuits."},
-{id:354,meal:"Gingerbread Men",cat:"Quick",time:"30 mins",diff:"Easy",desc:"Spiced biscuits to decorate.",ingredients:["350g flour","175g butter","175g sugar","4 tbsp golden syrup","2 tsp ginger","Icing"],steps:["Make dough. Roll and cut shapes.","Bake 180°C 12 mins.","Decorate with icing."],tip:"Fun to make and decorate together!"},
-{id:355,meal:"Chocolate Brownies",cat:"Quick",time:"35 mins",diff:"Easy",desc:"Rich, fudgy chocolate brownies.",ingredients:["200g dark chocolate","200g butter","300g sugar","3 eggs","100g flour"],steps:["Melt chocolate and butter. Add sugar and eggs.","Fold in flour. Bake 180°C 25 mins."],tip:"Gooey and chocolatey - a special treat!"},
+{id:347,meal:"Sticky Toffee Pudding",cat:"Pudding",time:"45 mins",diff:"Medium",desc:"Rich date sponge with toffee sauce.",ingredients:["200g dates","175g flour","175g sugar","2 eggs","Toffee sauce","Ice cream"],steps:["Soak dates in hot water. Make sponge batter.","Bake 180°C 30 mins.","Serve warm with toffee sauce."],tip:"Very sweet - a small portion for your daughter."},
+{id:348,meal:"Banoffee Pie",cat:"Pudding",time:"20 mins",diff:"Easy",desc:"Banana and toffee pie with cream.",ingredients:["1 biscuit base","397g tin caramel","3 bananas","300ml cream","Chocolate shavings"],steps:["Spread caramel on base.","Top with sliced bananas and cream.","Dust with chocolate."],tip:"Sweet and creamy - toddler heaven!"},
+{id:349,meal:"Lemon Drizzle Cake",cat:"Pudding",time:"40 mins",diff:"Easy",desc:"Moist lemon cake with crunchy lemon topping.",ingredients:["175g butter","175g sugar","3 eggs","175g flour","2 lemons"],steps:["Make sponge batter. Bake 180°C 30 mins.","Drizzle lemon syrup over hot cake."],tip:"The zingy lemon flavour is refreshing."},
+{id:350,meal:"Carrot Cake",cat:"Pudding",time:"50 mins",diff:"Easy",desc:"Moist spiced carrot cake with cream cheese frosting.",ingredients:["200g carrots, grated","200g sugar","200ml oil","3 eggs","200g flour","Cream cheese frosting"],steps:["Mix wet ingredients. Fold in dry and carrots.","Bake 180°C 40 mins.","Top with frosting."],tip:"A sneaky way to get carrots into toddlers!"},
+{id:351,meal:"Fairy Cakes",cat:"Pudding",time:"25 mins",diff:"Easy",desc:"Little cupcakes with buttercream icing.",ingredients:["100g butter","100g sugar","2 eggs","100g flour","Buttercream","Sprinkles"],steps:["Cream butter and sugar. Add eggs and flour.","Bake in cases 15 mins.","Top with buttercream and sprinkles."],tip:"Perfect for little hands and baking together."},
+{id:352,meal:"Flapjacks",cat:"Pudding",time:"30 mins",diff:"Easy",desc:"Chewy oat bars with golden syrup.",ingredients:["150g butter","150g sugar","2 tbsp golden syrup","300g oats"],steps:["Melt butter, sugar, syrup.","Mix in oats. Press into tin.","Bake 180°C 20 mins. Cut while warm."],tip:"Chewy and sweet - a great snack."},
+{id:353,meal:"Shortbread",cat:"Pudding",time:"35 mins",diff:"Easy",desc:"Buttery Scottish biscuits.",ingredients:["200g butter","100g sugar","300g flour"],steps:["Cream butter and sugar. Add flour.","Press into tin. Prick with fork.","Bake 160°C 25 mins."],tip:"Melt-in-the-mouth biscuits."},
+{id:354,meal:"Gingerbread Men",cat:"Pudding",time:"30 mins",diff:"Easy",desc:"Spiced biscuits to decorate.",ingredients:["350g flour","175g butter","175g sugar","4 tbsp golden syrup","2 tsp ginger","Icing"],steps:["Make dough. Roll and cut shapes.","Bake 180°C 12 mins.","Decorate with icing."],tip:"Fun to make and decorate together!"},
+{id:355,meal:"Chocolate Brownies",cat:"Pudding",time:"35 mins",diff:"Easy",desc:"Rich, fudgy chocolate brownies.",ingredients:["200g dark chocolate","200g butter","300g sugar","3 eggs","100g flour"],steps:["Melt chocolate and butter. Add sugar and eggs.","Fold in flour. Bake 180°C 25 mins."],tip:"Gooey and chocolatey - a special treat!"},
 {id:356,meal:"Chinese Char Kway Teow",cat:"World",time:"15 mins",diff:"Easy",desc:"Smoky stir-fried flat noodles with soy sauce, egg and beansprouts.",ingredients:["250g flat rice noodles","2 eggs","Beansprouts","Spring onions","Chinese sausage (lap cheong) or bacon","3 tbsp dark soy sauce","1 tbsp light soy sauce","Garlic","Chives","Oil"],steps:["Soak noodles. Heat wok until smoking.","Fry garlic and sliced sausage 1 min.","Push aside. Scramble eggs. Add noodles.","Add soy sauces, beansprouts, spring onions. Toss 2 mins."],tip:"Smoky flat noodles. Cut short for your daughter. A Malaysian-Chinese hawker classic."},
 ];
 
-const CAT_EMOJI={Pasta:"🍝",Mexican:"🌮",Curry:"🍛",Roast:"🍗",Comfort:"🥘",Quick:"⚡",Pizza:"🍕",World:"🌍"};
-const CAT_COL={Pasta:"#D4603A",Mexican:"#2E7D32",Curry:"#E8A838",Roast:"#8D6E63",Comfort:"#5B8C5A",Quick:"#4A6FA5",Pizza:"#C0392B",World:"#7B1FA2"};
+const CAT_EMOJI={Pasta:"🍝",Mexican:"🌮",Curry:"🍛",Roast:"🍗",Comfort:"🥘",Quick:"⚡",Pizza:"🍕",World:"🌍",Pudding:"🍰"};
+const CAT_COL={Pasta:"#D4603A",Mexican:"#2E7D32",Curry:"#E8A838",Roast:"#8D6E63",Comfort:"#5B8C5A",Quick:"#4A6FA5",Pizza:"#C0392B",World:"#7B1FA2",Pudding:"#E8A0BF"};
 const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DOWS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DOWFULL=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -686,7 +739,7 @@ function loadPlan(){
   loadFavs();
   loadChecked();
   try{
-    const raw=localStorage.getItem("mealplan-v6");
+    const raw=localStorage.getItem("mealplan-v7");
     if(raw){
       const d=JSON.parse(raw);
       const end=new Date(d.endDate);
@@ -700,9 +753,10 @@ function loadPlan(){
 
 function generatePlan(cycle){
   const now=new Date();
-  // Build weighted pool: favourites appear 3x more often
+  // Build weighted pool: favourites appear 3x more often, exclude puddings from main meals
   let pool=[];
   R.forEach(r=>{
+    if(r.cat==="Pudding") return; // Exclude puddings from dinner rotation
     pool.push(r);
     if(favs.has(r.id)){pool.push(r);pool.push(r);}
   });
@@ -730,7 +784,7 @@ function generatePlan(cycle){
       }
     }
     if(!pick) pick=pool[i%pool.length];
-    plan.push({date:d.toISOString().split("T")[0],recipeId:pick.id,dayNum:i+1});
+    plan.push({date:d.toISOString().split("T")[0],recipeId:pick.id,puddingId:null,dayNum:i+1});
   }
   const end=new Date(now); end.setDate(end.getDate()+27);
   meta={startDate:now.toISOString().split("T")[0],endDate:end.toISOString().split("T")[0],cycle};
@@ -738,16 +792,51 @@ function generatePlan(cycle){
 }
 
 function savePlan(){
-  try{localStorage.setItem("mealplan-v6",JSON.stringify({...meta,plan}));}catch{}
+  try{localStorage.setItem("mealplan-v7",JSON.stringify({...meta,plan}));}catch{}
 }
 
 function swapDay(dateStr){
   const cur=plan.find(p=>p.date===dateStr);
   const used=plan.map(p=>p.recipeId);
-  const avail=R.filter(r=>!used.includes(r.id));
-  const pool=avail.length?avail:R.filter(r=>r.id!==cur.recipeId);
+  const avail=R.filter(r=>r.cat!=="Pudding"&&!used.includes(r.id));
+  const pool=avail.length?avail:R.filter(r=>r.cat!=="Pudding"&&r.id!==cur.recipeId);
   cur.recipeId=pool[Math.floor(Math.random()*pool.length)].id;
   savePlan(); render();
+}
+
+// Pudding management
+function addPudding(dateStr){
+  const puddings=R.filter(r=>r.cat==="Pudding");
+  const entry=plan.find(p=>p.date===dateStr);
+  if(!entry)return;
+  // Show pudding picker modal
+  let h=`<div class="modal-head" style="background:linear-gradient(135deg,#E8A0BF,#F5C6D6)">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-cat">🍰 PUDDINGS</div>
+    <div class="modal-title">Add a Pudding</div>
+    <div class="modal-desc">Choose a dessert for ${new Date(dateStr).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'})}</div>
+  </div>
+  <div class="modal-body" style="max-height:60vh;overflow-y:auto">
+    <div style="display:grid;gap:10px">`;
+  puddings.forEach(p=>{
+    h+=`<div class="mini-card" onclick="setPudding('${dateStr}',${p.id});closeModal();render();" style="cursor:pointer">
+      <div class="mini-title">${p.meal}</div>
+      <div class="mini-desc">${p.desc}</div>
+      <div class="mini-time">⏱ ${p.time}</div>
+    </div>`;
+  });
+  h+=`</div>
+    <button onclick="setPudding('${dateStr}',null);closeModal();render();" style="margin-top:16px;width:100%;background:var(--bg-warm);border:1px solid var(--border);color:var(--muted);font-family:var(--sans);font-size:.85rem;font-weight:600;padding:12px;border-radius:10px;cursor:pointer">Remove Pudding</button>
+  </div>`;
+  $("modal").innerHTML=h;
+  $("modalOverlay").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+
+function setPudding(dateStr,puddingId){
+  const entry=plan.find(p=>p.date===dateStr);
+  if(entry)entry.puddingId=puddingId;
+  savePlan();
 }
 
 function getR(id){return R.find(r=>r.id===id);}
@@ -782,13 +871,19 @@ function renderCalendar(){
   for(let d=1;d<=days;d++){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
     const e=planMap[ds]; const r=e?getR(e.recipeId):null;
+    const pudding=e&&e.puddingId?getR(e.puddingId):null;
     const isToday=ds===todayStr;
     h+=`<div class="cal-cell${r?" has-meal":""}${isToday?" today":""}" ${r?`onclick="openRecipe(${r.id})"`:""}>
       <div class="cal-day">${d}</div>`;
     if(r){
       h+=`<div class="cal-cat" style="color:${CAT_COL[r.cat]||"#D4603A"}">${CAT_EMOJI[r.cat]||""} ${r.cat}</div>
-        <div class="cal-meal-name">${r.meal}</div>
-        <button class="cal-swap" onclick="event.stopPropagation();swapDay('${ds}')" title="Swap">🔄</button>
+        <div class="cal-meal-name">${r.meal}</div>`;
+      if(pudding){
+        h+=`<div class="cal-pudding" onclick="event.stopPropagation();addPudding('${ds}')" title="Change pudding">🍰 ${pudding.meal}</div>`;
+      }else{
+        h+=`<button class="cal-add-pudding" onclick="event.stopPropagation();addPudding('${ds}')" title="Add pudding">+ 🍰</button>`;
+      }
+      h+=`<button class="cal-swap" onclick="event.stopPropagation();swapDay('${ds}')" title="Swap">🔄</button>
         ${favHeart(r.id,"","fav-cal")}`;
     }
     h+=`</div>`;
@@ -1444,6 +1539,126 @@ function inlineAdHTML(slotSuffix){
 }
 function pushInlineAds(){
   try{document.querySelectorAll(".ad-slot-inline ins.adsbygoogle").forEach(()=>{(adsbygoogle=window.adsbygoogle||[]).push({});});}catch(e){}
+}
+
+// ── Sync Functionality ──
+function openSyncModal(){
+  const syncCode = generateSyncCode();
+  let h=`<div class="modal-head" style="background:linear-gradient(135deg,#93C5A4,#A8D5B8)">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-cat">🔄 SYNC</div>
+    <div class="modal-title">Sync Across Devices</div>
+    <div class="modal-desc">Keep your meal plan, favourites and settings in sync</div>
+  </div>
+  <div class="modal-body">
+    <div style="margin-bottom:24px">
+      <div class="section-title">Your Sync Code</div>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:12px">Copy this code to import your data on another device:</p>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="syncCodeOutput" value="${syncCode}" readonly style="flex:1;background:var(--bg-warm);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:monospace;font-size:.8rem;color:var(--text)">
+        <button onclick="copySyncCode()" style="background:var(--green);border:none;color:#fff;padding:12px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-family:var(--sans)">Copy</button>
+      </div>
+      <p id="copyFeedback" style="font-size:.75rem;color:var(--green);margin-top:8px;display:none">✓ Copied to clipboard!</p>
+    </div>
+    
+    <div style="border-top:1px solid var(--border);padding-top:24px">
+      <div class="section-title">Import From Another Device</div>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:12px">Paste a sync code from your other device:</p>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="syncCodeInput" placeholder="Paste sync code here..." style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:monospace;font-size:.8rem">
+        <button onclick="importSyncCode()" style="background:var(--accent);border:none;color:#fff;padding:12px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-family:var(--sans)">Import</button>
+      </div>
+      <p id="importFeedback" style="font-size:.75rem;margin-top:8px;display:none"></p>
+    </div>
+    
+    <div style="border-top:1px solid var(--border);padding-top:24px;margin-top:24px">
+      <p style="font-size:.75rem;color:var(--light);text-align:center">💡 Tip: Bookmark this page on all your devices and use sync codes to keep them in sync. Your data is stored locally on each device.</p>
+    </div>
+  </div>`;
+  $("modal").innerHTML=h;
+  $("modalOverlay").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+
+function generateSyncCode(){
+  const data = {
+    v: 1, // version
+    m: meta,
+    p: plan,
+    f: [...favs],
+    c: checkedItems ? [...checkedItems] : [],
+    pr: priceOverrides || {}
+  };
+  try {
+    const json = JSON.stringify(data);
+    return btoa(encodeURIComponent(json));
+  } catch(e) {
+    console.error('Failed to generate sync code', e);
+    return '';
+  }
+}
+
+function copySyncCode(){
+  const input = document.getElementById('syncCodeOutput');
+  input.select();
+  document.execCommand('copy');
+  const feedback = document.getElementById('copyFeedback');
+  feedback.style.display = 'block';
+  setTimeout(() => feedback.style.display = 'none', 3000);
+  trackEvent('sync_copy');
+}
+
+function importSyncCode(){
+  const input = document.getElementById('syncCodeInput');
+  const feedback = document.getElementById('importFeedback');
+  const code = input.value.trim();
+  
+  if(!code){
+    feedback.style.color = 'var(--accent)';
+    feedback.textContent = '⚠️ Please paste a sync code first';
+    feedback.style.display = 'block';
+    return;
+  }
+  
+  try {
+    const json = decodeURIComponent(atob(code));
+    const data = JSON.parse(json);
+    
+    if(!data.v || !data.m || !data.p){
+      throw new Error('Invalid sync code format');
+    }
+    
+    // Import the data
+    meta = data.m;
+    plan = data.p;
+    favs = new Set(data.f || []);
+    if(data.c) checkedItems = new Set(data.c);
+    if(data.pr) priceOverrides = data.pr;
+    
+    // Save everything
+    savePlan();
+    saveFavs();
+    saveChecked();
+    savePriceOverrides();
+    
+    feedback.style.color = 'var(--green)';
+    feedback.textContent = '✓ Successfully imported! Your meal plan has been updated.';
+    feedback.style.display = 'block';
+    
+    trackEvent('sync_import');
+    
+    // Refresh after a moment
+    setTimeout(() => {
+      closeModal();
+      render();
+    }, 1500);
+    
+  } catch(e) {
+    console.error('Failed to import sync code', e);
+    feedback.style.color = 'var(--accent)';
+    feedback.textContent = '⚠️ Invalid sync code. Please check and try again.';
+    feedback.style.display = 'block';
+  }
 }
 
 // ── Calendar nav ──
