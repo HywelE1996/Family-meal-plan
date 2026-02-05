@@ -22,9 +22,9 @@
 window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments);}
 gtag('js',new Date());
-// Default to denied — only enable after consent
-gtag('consent','default',{'analytics_storage':'denied','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});
-gtag('config','G-D5TTZBW803',{send_page_view:true});
+// Allow basic analytics by default; ads require consent
+gtag('consent','default',{'analytics_storage':'granted','ad_storage':'denied','ad_user_data':'denied','ad_personalization':'denied'});
+gtag('config','G-D5TTZBW803',{send_page_view:true,anonymize_ip:true});
 </script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
@@ -278,7 +278,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 
 <!-- Cookie Consent Banner (required for AdSense in UK/EU) -->
 <div class="cookie-banner" id="cookieBanner">
-  <div class="cookie-text">🍪 This site uses cookies to show relevant ads and improve your experience. By continuing, you consent to our use of cookies. <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">Learn more</a></div>
+  <div class="cookie-text">🍪 This site uses cookies to show relevant ads. We use basic anonymous analytics to improve the site. Accept to enable personalised ads, or decline for an ad-free experience. <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">Learn more</a></div>
   <div class="cookie-buttons">
     <button class="cookie-btn cookie-accept" onclick="acceptCookies()">Accept</button>
     <button class="cookie-btn cookie-decline" onclick="declineCookies()">Decline</button>
@@ -1401,16 +1401,16 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   });
 });
 
-// ── Cookie Consent ──
+// ── Cookie Consent (controls ad personalisation; basic analytics always active) ──
 function checkCookieConsent(){
   const consent=localStorage.getItem("cookie-consent");
   if(consent==="accepted"||consent==="declined"){
     document.getElementById("cookieBanner").classList.add("hidden");
   }
   if(consent==="accepted"){
-    // Grant GA and ad consent
+    // Grant ad consent
     if(typeof gtag==="function"){
-      gtag('consent','update',{'analytics_storage':'granted','ad_storage':'granted','ad_user_data':'granted','ad_personalization':'granted'});
+      gtag('consent','update',{'ad_storage':'granted','ad_user_data':'granted','ad_personalization':'granted'});
     }
   } else {
     // Disable ad loading if not consented
@@ -1420,9 +1420,9 @@ function checkCookieConsent(){
 function acceptCookies(){
   localStorage.setItem("cookie-consent","accepted");
   document.getElementById("cookieBanner").classList.add("hidden");
-  // Grant GA and ad consent
+  // Grant ad consent
   if(typeof gtag==="function"){
-    gtag('consent','update',{'analytics_storage':'granted','ad_storage':'granted','ad_user_data':'granted','ad_personalization':'granted'});
+    gtag('consent','update',{'ad_storage':'granted','ad_user_data':'granted','ad_personalization':'granted'});
   }
 }
 function declineCookies(){
