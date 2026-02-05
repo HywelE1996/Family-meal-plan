@@ -80,8 +80,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .cal-swap:hover{opacity:1;background:var(--accent);color:#fff}
 .cal-add-pudding{background:var(--pink-lt);border:1px dashed var(--accent);border-radius:6px;padding:2px 6px;font-size:.6rem;cursor:pointer;margin-top:4px;color:var(--accent);font-weight:600}
 .cal-add-pudding:hover{background:var(--accent);color:#fff;border-style:solid}
-.cal-pudding{background:var(--pink-lt);border-radius:6px;padding:2px 6px;font-size:.58rem;margin-top:4px;color:var(--accent);font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cal-pudding:hover{background:var(--accent);color:#fff}
+.cal-pudding-wrap{display:flex;align-items:center;gap:4px;margin-top:4px}
+.cal-pudding-link{background:var(--pink-lt);border-radius:6px;padding:2px 6px;font-size:.58rem;color:var(--accent);font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.cal-pudding-link:hover{background:var(--accent);color:#fff}
+.cal-pudding-change{background:var(--bg-warm);border:1px solid var(--border);border-radius:4px;width:18px;height:18px;font-size:.55rem;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cal-pudding-change:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 .cal-actions{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .regen-btn{background:var(--accent);color:#fff;border:none;font-family:var(--sans);font-size:.82rem;font-weight:600;padding:10px 20px;border-radius:100px;cursor:pointer}
 .regen-btn:hover{background:var(--accent-hover)}
@@ -103,7 +106,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   .cal-meal-name{font-size:.6rem}
   .cal-swap{width:16px;height:16px;font-size:.5rem;top:2px;right:2px}
   .cal-add-pudding{font-size:.5rem;padding:1px 4px}
-  .cal-pudding{font-size:.5rem;padding:1px 4px}
+  .cal-pudding-wrap{gap:2px}
+  .cal-pudding-link{font-size:.5rem;padding:1px 4px}
+  .cal-pudding-change{width:14px;height:14px;font-size:.45rem}
   .fav-cal{font-size:.6rem}
   .card-grid{grid-template-columns:1fr}
   .meal-card{padding:14px}
@@ -126,7 +131,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   .cal-dow{font-size:.6rem;padding:4px 0}
   .cal-cell{min-height:60px}
   .cal-meal-name{display:none}
-  .cal-add-pudding,.cal-pudding{display:none}
+  .cal-add-pudding,.cal-pudding-wrap{display:none}
   .shop-meals{grid-template-columns:1fr}
   .shop-compare-card{min-width:70px;padding:8px 10px}
   .shop-compare-name{font-size:.6rem}
@@ -203,6 +208,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .shop-meal-card .shop-dow{font-weight:700;color:var(--accent);font-size:.7rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
 .shop-meal-card .shop-name{font-family:var(--serif);font-size:.95rem;margin-bottom:2px}
 .shop-meal-card .shop-cat{font-size:.7rem;color:var(--light)}
+.shop-pudding-card{border-color:var(--pink);background:var(--pink-lt)}
+.shop-pudding-card:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+.shop-pudding-card .shop-dow{color:var(--accent)}
 .shop-list-section{margin-bottom:24px}
 .shop-list-title{font-family:var(--serif);font-size:1.1rem;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
 .shop-list-title span{font-size:.75rem;color:var(--light);font-family:var(--sans)}
@@ -879,7 +887,10 @@ function renderCalendar(){
       h+=`<div class="cal-cat" style="color:${CAT_COL[r.cat]||"#D4603A"}">${CAT_EMOJI[r.cat]||""} ${r.cat}</div>
         <div class="cal-meal-name">${r.meal}</div>`;
       if(pudding){
-        h+=`<div class="cal-pudding" onclick="event.stopPropagation();addPudding('${ds}')" title="Change pudding">🍰 ${pudding.meal}</div>`;
+        h+=`<div class="cal-pudding-wrap">
+          <span class="cal-pudding-link" onclick="event.stopPropagation();openRecipe(${pudding.id})" title="View recipe">🍰 ${pudding.meal}</span>
+          <button class="cal-pudding-change" onclick="event.stopPropagation();addPudding('${ds}')" title="Change pudding">✎</button>
+        </div>`;
       }else{
         h+=`<button class="cal-add-pudding" onclick="event.stopPropagation();addPudding('${ds}')" title="Add pudding">+ 🍰</button>`;
       }
@@ -1326,19 +1337,25 @@ function renderShopping(){
   const satDate=new Date(weekDays[6]);
   const weekLabel=`${sundayDate.getDate()} ${MONTHS[sundayDate.getMonth()].slice(0,3)} — ${satDate.getDate()} ${MONTHS[satDate.getMonth()].slice(0,3)} ${satDate.getFullYear()}`;
   
-  // Gather the week's recipes
+  // Gather the week's recipes and puddings
   const weekRecipes=[];
+  const weekPuddings=[];
   weekDays.forEach((ds,i)=>{
     const entry=planMap[ds];
     if(entry){
       const r=getR(entry.recipeId);
       if(r)weekRecipes.push({date:ds,dow:DOWFULL[new Date(ds).getDay()],recipe:r});
+      // Also gather puddings
+      if(entry.puddingId){
+        const p=getR(entry.puddingId);
+        if(p)weekPuddings.push({date:ds,dow:DOWFULL[new Date(ds).getDay()],recipe:p});
+      }
     }
   });
   
-  // Build combined ingredient list, categorised
+  // Build combined ingredient list, categorised (including puddings)
   const allIngs={};
-  weekRecipes.forEach(({recipe})=>{
+  const addIngredients=(recipe)=>{
     recipe.ingredients.forEach(ing=>{
       const cat=categoriseIngredient(ing);
       if(!allIngs[cat])allIngs[cat]=[];
@@ -1347,7 +1364,9 @@ function renderShopping(){
         allIngs[cat].push(ing);
       }
     });
-  });
+  };
+  weekRecipes.forEach(({recipe})=>addIngredients(recipe));
+  weekPuddings.forEach(({recipe})=>addIngredients(recipe));
   
   const catOrder=["🥩 Meat & Poultry","🐟 Fish","🧀 Dairy & Eggs","🥬 Fruit & Vegetables","🍞 Bread, Pasta & Grains","🥫 Tins & Stock","🫙 Sauces & Condiments","🌶️ Herbs & Spices","🛒 Other"];
   
@@ -1415,6 +1434,22 @@ function renderShopping(){
     </div>`;
   });
   h+=`</div>`;
+  
+  // Show puddings if any
+  if(weekPuddings.length>0){
+    h+=`<h3 style="font-family:var(--serif);font-size:1rem;margin:20px 0 12px">🍰 Puddings This Week</h3>
+      <div class="shop-meals">`;
+    weekPuddings.forEach(({dow,recipe})=>{
+      const puddingCost=recipe.ingredients.reduce((sum,ing)=>sum+getIngPrice(ing,storeIdx),0);
+      h+=`<div class="shop-meal-card shop-pudding-card" onclick="openRecipe(${recipe.id})">
+        <div class="shop-dow">${dow}</div>
+        <div class="shop-name">${recipe.meal}</div>
+        <div class="shop-cat" style="color:${CAT_COL[recipe.cat]||'#E8A0BF'}">${CAT_EMOJI[recipe.cat]||'🍰'} ${recipe.cat} · ${recipe.time}</div>
+        <div style="font-size:.78rem;font-weight:700;color:var(--accent);margin-top:4px">£${puddingCost.toFixed(2)}</div>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
   
   // Actions
   const totalItems=allItems.length;
