@@ -68,27 +68,115 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .cal-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-lt)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cal-dow{text-align:center;font-size:.72rem;font-weight:700;color:var(--light);padding:8px 0;text-transform:uppercase;letter-spacing:1px}
-.cal-cell{background:var(--bg-warm);border:1px solid var(--border);border-radius:12px;padding:8px 6px;min-height:90px;position:relative;transition:all .2s}
+.cal-cell{background:var(--bg-warm);border:1px solid var(--border);border-radius:12px;padding:8px 6px;min-height:90px;position:relative;transition:all .2s;overflow:hidden}
 .cal-cell.has-meal{background:var(--card);cursor:pointer}
 .cal-cell.has-meal:hover{border-color:var(--accent);box-shadow:var(--shadow)}
 .cal-cell.today{border:2px solid var(--green)}
 .cal-day{font-size:.72rem;font-weight:700;color:var(--light);margin-bottom:4px}
 .cal-cell.today .cal-day{color:var(--green)}
-.cal-cat{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
-.cal-meal-name{font-size:.72rem;font-weight:600;color:var(--text);line-height:1.3}
-.cal-swap{position:absolute;top:4px;right:4px;background:var(--bg-warm);border:none;border-radius:6px;width:20px;height:20px;cursor:pointer;font-size:.6rem;opacity:.5;display:flex;align-items:center;justify-content:center}
+.cal-cat{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal-meal-name{font-size:.72rem;font-weight:600;color:var(--text);line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cal-swap{position:absolute;top:4px;right:4px;background:var(--bg-warm);border:none;border-radius:6px;width:20px;height:20px;cursor:pointer;font-size:.6rem;opacity:.5;display:flex;align-items:center;justify-content:center;z-index:2}
 .cal-swap:hover{opacity:1;background:var(--accent);color:#fff}
-.cal-add-pudding{background:var(--pink-lt);border:1px dashed var(--accent);border-radius:6px;padding:2px 6px;font-size:.6rem;cursor:pointer;margin-top:4px;color:var(--accent);font-weight:600}
+.cal-add-pudding{background:var(--pink-lt);border:1px dashed var(--accent);border-radius:6px;padding:2px 6px;font-size:.6rem;cursor:pointer;margin-top:4px;color:var(--accent);font-weight:600;display:inline-block;max-width:calc(100% - 24px)}
 .cal-add-pudding:hover{background:var(--accent);color:#fff;border-style:solid}
-.cal-pudding-wrap{display:flex;align-items:center;gap:4px;margin-top:4px}
-.cal-pudding-link{background:var(--pink-lt);border-radius:6px;padding:2px 6px;font-size:.58rem;color:var(--accent);font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.cal-pudding-wrap{display:flex;align-items:center;gap:2px;margin-top:4px;max-width:calc(100% - 24px)}
+.cal-pudding-link{background:var(--pink-lt);border-radius:6px;padding:2px 4px;font-size:.55rem;color:var(--accent);font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
 .cal-pudding-link:hover{background:var(--accent);color:#fff}
-.cal-pudding-change{background:var(--bg-warm);border:1px solid var(--border);border-radius:4px;width:18px;height:18px;font-size:.55rem;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cal-pudding-change{background:var(--bg-warm);border:1px solid var(--border);border-radius:4px;width:16px;height:16px;font-size:.5rem;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .cal-pudding-change:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Swap menu dropdown */
+.swap-menu{background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.15);overflow:hidden;min-width:140px}
+.swap-menu-item{padding:10px 14px;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text)}
+.swap-menu-item:hover{background:var(--green-lt);color:var(--green)}
+.swap-menu-item:first-child{border-bottom:1px solid var(--border)}
+.swap-menu-item:not(:last-child){border-bottom:1px solid var(--border)}
+.swap-menu-restore{color:var(--muted);font-size:.78rem}
+
+/* Recipe picker */
+.picker-recipe{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-warm);border-radius:8px;cursor:pointer;transition:all .15s}
+.picker-recipe:hover{background:var(--green-lt);border-color:var(--green)}
+.picker-recipe.picker-current{background:var(--pink-lt);border:1px solid var(--accent)}
+.picker-name{flex:1;font-size:.85rem;font-weight:500}
+.picker-time{font-size:.72rem;color:var(--light)}
+.picker-current-badge{font-size:.65rem;background:var(--accent);color:#fff;padding:2px 8px;border-radius:100px;font-weight:600}
+
+/* Takeaway picker */
+.takeaway-option{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 12px;background:var(--bg-warm);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s}
+.takeaway-option:hover{background:var(--yellow-lt);border-color:#F59E0B;transform:scale(1.02)}
+.takeaway-emoji{font-size:1.8rem}
+.takeaway-name{font-size:.82rem;font-weight:600;color:var(--text)}
+
+/* Takeaway display on calendar */
+.cal-takeaway{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:6px;padding:4px 6px;margin-top:2px}
+.cal-takeaway-name{font-size:.7rem;font-weight:600;color:#92400E}
+
 .cal-actions{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .regen-btn{background:var(--accent);color:#fff;border:none;font-family:var(--sans);font-size:.82rem;font-weight:600;padding:10px 20px;border-radius:100px;cursor:pointer}
 .regen-btn:hover{background:var(--accent-hover)}
+.cal-print-btn{background:var(--green);color:#fff;border:none;font-family:var(--sans);font-size:.82rem;font-weight:600;padding:10px 20px;border-radius:100px;cursor:pointer}
+.cal-print-btn:hover{background:#4A7A4A}
 .cal-hint{font-size:.78rem;color:var(--light)}
+
+/* Calendar Print Styles */
+@media print{
+  /* Hide non-essential elements */
+  .hero,.tabs,.footer,.cal-actions,.modal-overlay,.cookie-banner,.ad-slot{display:none!important}
+  
+  /* Reset page */
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  html,body{background:#fff!important;margin:0!important;padding:0!important}
+  .main{padding:0!important;max-width:100%!important}
+  
+  /* Calendar title for print */
+  .cal-print-header{display:block!important;text-align:center;margin-bottom:20px;padding-top:10px}
+  .cal-print-header h1{font-family:var(--serif);font-size:24pt;margin-bottom:5px;color:#333}
+  .cal-print-header p{font-size:11pt;color:#666}
+  
+  /* Calendar nav - just show the month/year */
+  .cal-nav{justify-content:center!important;margin-bottom:15px!important}
+  .cal-nav button{display:none!important}
+  .cal-nav h2{font-size:18pt!important;color:#333!important}
+  
+  /* Calendar grid */
+  .cal-grid{gap:2px!important;border:1px solid #ccc}
+  .cal-dow{background:#93C5A4!important;color:#fff!important;font-size:9pt!important;padding:8px 4px!important;font-weight:700!important}
+  
+  /* Calendar cells */
+  .cal-cell{border:1px solid #ddd!important;border-radius:4px!important;min-height:80px!important;padding:6px!important;background:#fff!important;page-break-inside:avoid}
+  .cal-cell.has-meal{background:#fff!important}
+  .cal-cell.today{border:2px solid #93C5A4!important;background:#E8F5ED!important}
+  
+  /* Day number */
+  .cal-day{font-size:11pt!important;font-weight:700!important;color:#333!important;margin-bottom:4px!important}
+  .cal-cell.today .cal-day{color:#2D4A35!important}
+  
+  /* Category */
+  .cal-cat{font-size:7pt!important;margin-bottom:2px!important;letter-spacing:0!important}
+  
+  /* Meal name - ensure it shows */
+  .cal-meal-name{font-size:9pt!important;font-weight:600!important;color:#333!important;display:block!important;-webkit-line-clamp:unset!important;overflow:visible!important}
+  
+  /* Pudding */
+  .cal-pudding-wrap{margin-top:4px!important;max-width:100%!important}
+  .cal-pudding-link{font-size:7pt!important;background:#FCE7F3!important;padding:2px 4px!important;display:inline-block!important}
+  .cal-pudding-change{display:none!important}
+  .cal-add-pudding{display:none!important}
+  
+  /* Takeaway */
+  .cal-takeaway{background:#FEF3C7!important;padding:4px!important;margin-top:2px!important}
+  .cal-takeaway-name{font-size:8pt!important;color:#92400E!important}
+  
+  /* Hide interactive elements */
+  .cal-swap,.fav-btn,.fav-cal{display:none!important}
+  
+  /* Page setup */
+  @page{size:landscape;margin:10mm}
+}
+
+/* Print header - hidden normally, shown in print */
+.cal-print-header{display:none}
 
 /* Mobile responsiveness */
 @media(max-width:768px){
@@ -211,6 +299,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .shop-pudding-card{border-color:var(--pink);background:var(--pink-lt)}
 .shop-pudding-card:hover{border-color:var(--accent);box-shadow:var(--shadow)}
 .shop-pudding-card .shop-dow{color:var(--accent)}
+.shop-takeaway-card{border-color:#F59E0B;background:linear-gradient(135deg,#FEF3C7,#FDE68A)}
+.shop-takeaway-card .shop-dow{color:#92400E}
 .shop-list-section{margin-bottom:24px}
 .shop-list-title{font-family:var(--serif);font-size:1.1rem;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
 .shop-list-title span{font-size:.75rem;color:var(--light);font-family:var(--sans)}
@@ -803,13 +893,204 @@ function savePlan(){
   try{localStorage.setItem("mealplan-v7",JSON.stringify({...meta,plan}));}catch{}
 }
 
-function swapDay(dateStr){
+// Swap menu functions
+function showSwapMenu(dateStr,event){
+  event.stopPropagation();
+  // Close any existing swap menu
+  document.querySelectorAll('.swap-menu').forEach(m=>m.remove());
+  
+  const btn=event.currentTarget;
+  const rect=btn.getBoundingClientRect();
+  const entry=plan.find(p=>p.date===dateStr);
+  const isTakeaway=entry&&entry.takeaway;
+  
+  const menu=document.createElement('div');
+  menu.className='swap-menu';
+  menu.innerHTML=`
+    <div class="swap-menu-item" onclick="event.stopPropagation();swapRandom('${dateStr}')">🎲 Random swap</div>
+    <div class="swap-menu-item" onclick="event.stopPropagation();showRecipePicker('${dateStr}')">📋 Choose recipe</div>
+    <div class="swap-menu-item" onclick="event.stopPropagation();showTakeawayPicker('${dateStr}')">🥡 Takeaway night</div>
+    ${isTakeaway?`<div class="swap-menu-item swap-menu-restore" onclick="event.stopPropagation();restoreRecipe('${dateStr}')">↩️ Restore recipe</div>`:''}
+  `;
+  menu.style.position='fixed';
+  menu.style.top=(rect.bottom+4)+'px';
+  menu.style.left=Math.min(rect.left,window.innerWidth-150)+'px';
+  menu.style.zIndex='1001';
+  
+  document.body.appendChild(menu);
+  
+  // Close menu when clicking elsewhere
+  setTimeout(()=>{
+    document.addEventListener('click',function closeMenu(){
+      menu.remove();
+      document.removeEventListener('click',closeMenu);
+    },{once:true});
+  },10);
+}
+
+function swapRandom(dateStr){
+  document.querySelectorAll('.swap-menu').forEach(m=>m.remove());
   const cur=plan.find(p=>p.date===dateStr);
   const used=plan.map(p=>p.recipeId);
   const avail=R.filter(r=>r.cat!=="Pudding"&&!used.includes(r.id));
   const pool=avail.length?avail:R.filter(r=>r.cat!=="Pudding"&&r.id!==cur.recipeId);
   cur.recipeId=pool[Math.floor(Math.random()*pool.length)].id;
   savePlan(); render();
+}
+
+function showRecipePicker(dateStr){
+  document.querySelectorAll('.swap-menu').forEach(m=>m.remove());
+  const entry=plan.find(p=>p.date===dateStr);
+  if(!entry)return;
+  const currentRecipe=getR(entry.recipeId);
+  const recipes=R.filter(r=>r.cat!=="Pudding");
+  
+  // Group by category
+  const byCategory={};
+  recipes.forEach(r=>{
+    if(!byCategory[r.cat])byCategory[r.cat]=[];
+    byCategory[r.cat].push(r);
+  });
+  
+  let h=`<div class="modal-head">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-cat">🔄 SWAP RECIPE</div>
+    <div class="modal-title">Choose a Recipe</div>
+    <div class="modal-desc">Pick a meal for ${new Date(dateStr).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'})}</div>
+  </div>
+  <div class="modal-body" style="padding:16px">
+    <input type="text" id="recipePickerSearch" placeholder="Search recipes..." 
+      style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;margin-bottom:16px;font-family:var(--sans)"
+      oninput="filterRecipePicker()">
+    <div id="recipePickerList" style="max-height:50vh;overflow-y:auto">`;
+  
+  const catOrder=["Quick","Comfort","Pasta","Curry","Mexican","Roast","Pizza","World"];
+  catOrder.forEach(cat=>{
+    if(!byCategory[cat])return;
+    h+=`<div class="picker-category" data-cat="${cat}">
+      <div style="font-weight:700;font-size:.8rem;color:${CAT_COL[cat]||'var(--muted)'};margin:12px 0 8px;text-transform:uppercase;letter-spacing:1px">${CAT_EMOJI[cat]||''} ${cat}</div>
+      <div style="display:grid;gap:6px">`;
+    byCategory[cat].forEach(r=>{
+      const isCurrentRecipe=r.id===entry.recipeId;
+      h+=`<div class="picker-recipe${isCurrentRecipe?' picker-current':''}" data-name="${r.meal.toLowerCase()}" onclick="selectRecipeForDay('${dateStr}',${r.id})">
+        <span class="picker-name">${r.meal}</span>
+        <span class="picker-time">${r.time}</span>
+        ${isCurrentRecipe?'<span class="picker-current-badge">Current</span>':''}
+      </div>`;
+    });
+    h+=`</div></div>`;
+  });
+  
+  h+=`</div></div>`;
+  $("modal").innerHTML=h;
+  $("modalOverlay").classList.add("open");
+  document.body.style.overflow="hidden";
+  
+  // Focus search
+  setTimeout(()=>document.getElementById('recipePickerSearch')?.focus(),100);
+}
+
+function filterRecipePicker(){
+  const search=document.getElementById('recipePickerSearch').value.toLowerCase().trim();
+  document.querySelectorAll('.picker-recipe').forEach(el=>{
+    const name=el.dataset.name||'';
+    el.style.display=name.includes(search)?'':'none';
+  });
+  // Hide empty categories
+  document.querySelectorAll('.picker-category').forEach(cat=>{
+    const visible=[...cat.querySelectorAll('.picker-recipe')].some(r=>r.style.display!=='none');
+    cat.style.display=visible?'':'none';
+  });
+}
+
+function selectRecipeForDay(dateStr,recipeId){
+  const entry=plan.find(p=>p.date===dateStr);
+  if(entry){
+    entry.recipeId=recipeId;
+    delete entry.takeaway; // Clear takeaway if selecting a recipe
+    savePlan();
+  }
+  closeModal();
+  render();
+}
+
+// Takeaway functions
+const TAKEAWAY_OPTIONS=[
+  {name:"Chinese",emoji:"🥡"},
+  {name:"Indian",emoji:"🍛"},
+  {name:"Pizza",emoji:"🍕"},
+  {name:"Fish & Chips",emoji:"🐟"},
+  {name:"Thai",emoji:"🍜"},
+  {name:"Kebab",emoji:"🥙"},
+  {name:"Burger",emoji:"🍔"},
+  {name:"Sushi",emoji:"🍣"},
+  {name:"Mexican",emoji:"🌮"},
+  {name:"Fried Chicken",emoji:"🍗"},
+];
+
+function showTakeawayPicker(dateStr){
+  document.querySelectorAll('.swap-menu').forEach(m=>m.remove());
+  const entry=plan.find(p=>p.date===dateStr);
+  if(!entry)return;
+  
+  let h=`<div class="modal-head" style="background:linear-gradient(135deg,#F59E0B,#FBBF24)">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-cat">🥡 TAKEAWAY</div>
+    <div class="modal-title">Takeaway Night!</div>
+    <div class="modal-desc">Choose your takeaway for ${new Date(dateStr).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'})}</div>
+  </div>
+  <div class="modal-body" style="padding:16px">
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px">`;
+  
+  TAKEAWAY_OPTIONS.forEach(t=>{
+    h+=`<div class="takeaway-option" onclick="setTakeaway('${dateStr}','${t.name}','${t.emoji}')">
+      <span class="takeaway-emoji">${t.emoji}</span>
+      <span class="takeaway-name">${t.name}</span>
+    </div>`;
+  });
+  
+  h+=`</div>
+    <div style="border-top:1px solid var(--border);padding-top:16px">
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:10px">Or enter your own:</p>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="customTakeaway" placeholder="e.g. Nando's, Domino's..." 
+          style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;font-family:var(--sans)">
+        <button onclick="setCustomTakeaway('${dateStr}')" 
+          style="background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-family:var(--sans)">Add</button>
+      </div>
+    </div>
+  </div>`;
+  
+  $("modal").innerHTML=h;
+  $("modalOverlay").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+
+function setTakeaway(dateStr,name,emoji){
+  const entry=plan.find(p=>p.date===dateStr);
+  if(entry){
+    entry.takeaway={name,emoji};
+    savePlan();
+  }
+  closeModal();
+  render();
+}
+
+function setCustomTakeaway(dateStr){
+  const input=document.getElementById('customTakeaway');
+  const name=input.value.trim();
+  if(!name)return;
+  setTakeaway(dateStr,name,'🥡');
+}
+
+function restoreRecipe(dateStr){
+  document.querySelectorAll('.swap-menu').forEach(m=>m.remove());
+  const entry=plan.find(p=>p.date===dateStr);
+  if(entry){
+    delete entry.takeaway;
+    savePlan();
+  }
+  render();
 }
 
 // Pudding management
@@ -851,6 +1132,25 @@ function getR(id){return R.find(r=>r.id===id);}
 function today(){return new Date().toISOString().split("T")[0];}
 function daysLeft(){return Math.max(0,Math.ceil((new Date(meta.endDate)-new Date())/(864e5))+1);}
 
+// Print calendar function
+function printCalendar(){
+  // Temporarily switch to calendar view if not already there
+  const wasTab=currentTab;
+  if(currentTab!=="calendar"){
+    currentTab="calendar";
+    render();
+  }
+  // Give a moment for render, then print
+  setTimeout(()=>{
+    window.print();
+    // Restore tab if needed
+    if(wasTab!=="calendar"){
+      currentTab=wasTab;
+      render();
+    }
+  },100);
+}
+
 // ── Rendering ──
 const $=id=>document.getElementById(id);
 
@@ -868,7 +1168,13 @@ function renderCalendar(){
   const days=new Date(calYear,calMonth+1,0).getDate();
   const planMap={}; plan.forEach(p=>{planMap[p.date]=p;});
   const todayStr=today();
-  let h=`<div class="cal-nav">
+  
+  // Print header (hidden on screen, shown in print)
+  let h=`<div class="cal-print-header">
+    <h1>🍽️ Family Meal Plan</h1>
+    <p>Cycle #${meta.cycle} · ${meta.startDate} to ${meta.endDate}</p>
+  </div>
+  <div class="cal-nav">
     <button class="cal-btn" onclick="prevMonth()">← Prev</button>
     <h2>${MONTHS[calMonth]} ${calYear}</h2>
     <button class="cal-btn" onclick="nextMonth()">Next →</button>
@@ -880,29 +1186,44 @@ function renderCalendar(){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
     const e=planMap[ds]; const r=e?getR(e.recipeId):null;
     const pudding=e&&e.puddingId?getR(e.puddingId):null;
+    const takeaway=e&&e.takeaway;
     const isToday=ds===todayStr;
-    h+=`<div class="cal-cell${r?" has-meal":""}${isToday?" today":""}" ${r?`onclick="openRecipe(${r.id})"`:""}>
-      <div class="cal-day">${d}</div>`;
-    if(r){
-      h+=`<div class="cal-cat" style="color:${CAT_COL[r.cat]||"#D4603A"}">${CAT_EMOJI[r.cat]||""} ${r.cat}</div>
-        <div class="cal-meal-name">${r.meal}</div>`;
-      if(pudding){
-        h+=`<div class="cal-pudding-wrap">
-          <span class="cal-pudding-link" onclick="event.stopPropagation();openRecipe(${pudding.id})" title="View recipe">🍰 ${pudding.meal}</span>
-          <button class="cal-pudding-change" onclick="event.stopPropagation();addPudding('${ds}')" title="Change pudding">✎</button>
-        </div>`;
-      }else{
-        h+=`<button class="cal-add-pudding" onclick="event.stopPropagation();addPudding('${ds}')" title="Add pudding">+ 🍰</button>`;
+    
+    // Check if it's a takeaway night
+    if(takeaway){
+      h+=`<div class="cal-cell has-meal${isToday?" today":""}">
+        <div class="cal-day">${d}</div>
+        <div class="cal-takeaway">
+          <div class="cal-takeaway-name">${takeaway.emoji} ${takeaway.name}</div>
+        </div>
+        <div class="cal-meal-name" style="color:var(--muted);font-size:.65rem;margin-top:2px">Takeaway Night</div>
+        <button class="cal-swap" onclick="showSwapMenu('${ds}',event)" title="Change">🔄</button>
+      </div>`;
+    } else {
+      h+=`<div class="cal-cell${r?" has-meal":""}${isToday?" today":""}" ${r?`onclick="openRecipe(${r.id})"`:""}>
+        <div class="cal-day">${d}</div>`;
+      if(r){
+        h+=`<div class="cal-cat" style="color:${CAT_COL[r.cat]||"#D4603A"}">${CAT_EMOJI[r.cat]||""} ${r.cat}</div>
+          <div class="cal-meal-name">${r.meal}</div>`;
+        if(pudding){
+          h+=`<div class="cal-pudding-wrap">
+            <span class="cal-pudding-link" onclick="event.stopPropagation();openRecipe(${pudding.id})" title="View recipe">🍰 ${pudding.meal}</span>
+            <button class="cal-pudding-change" onclick="event.stopPropagation();addPudding('${ds}')" title="Change pudding">✎</button>
+          </div>`;
+        }else{
+          h+=`<button class="cal-add-pudding" onclick="event.stopPropagation();addPudding('${ds}')" title="Add pudding">+ 🍰</button>`;
+        }
+        h+=`<button class="cal-swap" onclick="showSwapMenu('${ds}',event)" title="Swap meal">🔄</button>
+          ${favHeart(r.id,"","fav-cal")}`;
       }
-      h+=`<button class="cal-swap" onclick="event.stopPropagation();swapDay('${ds}')" title="Swap">🔄</button>
-        ${favHeart(r.id,"","fav-cal")}`;
+      h+=`</div>`;
     }
-    h+=`</div>`;
   }
   h+=`</div>
   <div class="cal-actions">
     <button class="regen-btn" onclick="generatePlan(${meta.cycle+1});render();">🔄 Generate New 28-Day Plan</button>
-    <span class="cal-hint">🔄 Swap a meal · ❤️ Favourite a meal · Click to see recipe</span>
+    <button class="cal-print-btn" onclick="printCalendar()">🖨️ Print Calendar</button>
+    <span class="cal-hint">🔄 Swap a meal · ❤️ Favourite a meal · 🥡 Set takeaway · Click to see recipe</span>
   </div>`;
   $("main").innerHTML=h;
 }
@@ -1337,15 +1658,21 @@ function renderShopping(){
   const satDate=new Date(weekDays[6]);
   const weekLabel=`${sundayDate.getDate()} ${MONTHS[sundayDate.getMonth()].slice(0,3)} — ${satDate.getDate()} ${MONTHS[satDate.getMonth()].slice(0,3)} ${satDate.getFullYear()}`;
   
-  // Gather the week's recipes and puddings
+  // Gather the week's recipes, puddings, and takeaways
   const weekRecipes=[];
   const weekPuddings=[];
+  const weekTakeaways=[];
   weekDays.forEach((ds,i)=>{
     const entry=planMap[ds];
     if(entry){
-      const r=getR(entry.recipeId);
-      if(r)weekRecipes.push({date:ds,dow:DOWFULL[new Date(ds).getDay()],recipe:r});
-      // Also gather puddings
+      // Check if it's a takeaway night
+      if(entry.takeaway){
+        weekTakeaways.push({date:ds,dow:DOWFULL[new Date(ds).getDay()],takeaway:entry.takeaway});
+      } else {
+        const r=getR(entry.recipeId);
+        if(r)weekRecipes.push({date:ds,dow:DOWFULL[new Date(ds).getDay()],recipe:r});
+      }
+      // Also gather puddings (even on takeaway nights you might want pudding!)
       if(entry.puddingId){
         const p=getR(entry.puddingId);
         if(p)weekPuddings.push({date:ds,dow:DOWFULL[new Date(ds).getDay()],recipe:p});
@@ -1355,14 +1682,60 @@ function renderShopping(){
   
   // Build combined ingredient list, categorised (including puddings)
   const allIngs={};
+  
+  // Helper to normalise ingredient names for comparison
+  function normaliseIngredient(ing){
+    // Remove quantities, measurements and common prefixes
+    let norm = ing.toLowerCase().trim();
+    // Remove leading numbers and fractions
+    norm = norm.replace(/^[\d½¼¾⅓⅔⅛]+\s*/,'');
+    // Remove common measurements
+    norm = norm.replace(/^(g|kg|ml|l|tbsp|tsp|cup|oz|lb|handful|pinch|splash|dash|bunch|clove|cloves|slice|slices|piece|pieces|sprig|sprigs|tin|tins|can|cans|pack|packs|packet|packets)\s+/i,'');
+    // Remove "of" 
+    norm = norm.replace(/^of\s+/i,'');
+    // Remove common descriptors at start
+    norm = norm.replace(/^(large|small|medium|fresh|dried|chopped|diced|sliced|minced|grated|crushed|roughly|finely|thick|thin|good quality|shop bought|homemade)\s+/gi,'');
+    // Remove trailing descriptors
+    norm = norm.replace(/,?\s*(chopped|diced|sliced|minced|grated|crushed|peeled|deseeded|trimmed|to serve|to taste|optional|for frying|for cooking|for the.*|thinly sliced|roughly chopped)$/gi,'');
+    return norm.trim();
+  }
+  
+  // Helper to split multi-part ingredients
+  function splitIngredient(ing){
+    // Check if it looks like a multi-part ingredient (contains ": " followed by multiple items with commas)
+    if(ing.includes(': ')){
+      const parts = ing.split(': ');
+      const prefix = parts[0]; // e.g. "For the sauce" or "Sauce"
+      const items = parts.slice(1).join(': '); // Everything after the colon
+      // If there are multiple comma-separated items after the colon, split them
+      if(items.includes(', ')){
+        return items.split(', ').map(item => item.trim()).filter(item => item.length > 0);
+      }
+    }
+    // Also split items that are just comma-separated lists without a prefix
+    // But only if they look like distinct ingredients (not a single item with commas like "salt, pepper")
+    const commaParts = ing.split(', ');
+    if(commaParts.length > 2 && !ing.match(/salt.*pepper|oil.*salt|to taste/i)){
+      return commaParts.map(item => item.trim()).filter(item => item.length > 0);
+    }
+    return [ing];
+  }
+  
   const addIngredients=(recipe)=>{
     recipe.ingredients.forEach(ing=>{
-      const cat=categoriseIngredient(ing);
-      if(!allIngs[cat])allIngs[cat]=[];
-      const norm=ing.toLowerCase().trim();
-      if(!allIngs[cat].some(x=>x.toLowerCase().trim()===norm)){
-        allIngs[cat].push(ing);
-      }
+      // Split multi-part ingredients
+      const parts = splitIngredient(ing);
+      parts.forEach(part=>{
+        const cat=categoriseIngredient(part);
+        if(!allIngs[cat])allIngs[cat]=[];
+        const norm=normaliseIngredient(part);
+        // Check if we already have this ingredient (by normalised name)
+        const existing = allIngs[cat].find(x=>normaliseIngredient(x)===norm);
+        if(!existing){
+          allIngs[cat].push(part);
+        }
+        // Note: we keep the first instance's full text, but deduplicate by normalised name
+      });
     });
   };
   weekRecipes.forEach(({recipe})=>addIngredients(recipe));
@@ -1434,6 +1807,20 @@ function renderShopping(){
     </div>`;
   });
   h+=`</div>`;
+  
+  // Show takeaways if any
+  if(weekTakeaways.length>0){
+    h+=`<h3 style="font-family:var(--serif);font-size:1rem;margin:20px 0 12px">🥡 Takeaway Nights</h3>
+      <div class="shop-meals">`;
+    weekTakeaways.forEach(({dow,takeaway})=>{
+      h+=`<div class="shop-meal-card shop-takeaway-card">
+        <div class="shop-dow">${dow}</div>
+        <div class="shop-name">${takeaway.emoji} ${takeaway.name}</div>
+        <div class="shop-cat" style="color:#92400E">No cooking needed! 🎉</div>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
   
   // Show puddings if any
   if(weekPuddings.length>0){
