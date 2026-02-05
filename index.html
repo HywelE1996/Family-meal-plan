@@ -352,6 +352,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .fav-indicator{color:#E74C3C;font-size:.7rem;margin-left:4px}
 .fav-count{display:inline-flex;align-items:center;gap:4px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.25);color:#E74C3C;font-size:.75rem;font-weight:600;padding:3px 10px;border-radius:100px;margin-left:8px}
 
+/* Dislike button */
+.dislike-btn{background:none;border:none;cursor:pointer;font-size:.9rem;padding:2px;line-height:1;transition:transform .2s;opacity:.4}
+.dislike-btn:hover{transform:scale(1.2);opacity:1}
+.dislike-btn.active{opacity:1}
+.dislike-indicator{color:#6B7280;font-size:.65rem;margin-left:4px}
+.mini-card.disliked{opacity:.6;background:var(--bg-warm)}
+.mini-card.disliked:hover{opacity:.9}
 
 .footer{text-align:center;padding:32px 24px;color:var(--light);font-size:.78rem;border-top:1px solid var(--border)}
 .hidden{display:none!important}
@@ -810,6 +817,7 @@ let currentTab="calendar";
 let plan=null, meta=null;
 let calYear, calMonth;
 let favs=new Set();
+let dislikes=new Set();
 
 // ── Favourites ──
 function loadFavs(){
@@ -822,6 +830,11 @@ function toggleFav(id,e){
   if(e){e.stopPropagation();e.preventDefault();}
   const wasAdding=!favs.has(id);
   if(favs.has(id))favs.delete(id);else favs.add(id);
+  // If adding to favourites, remove from dislikes
+  if(wasAdding && dislikes.has(id)){
+    dislikes.delete(id);
+    saveDislikes();
+  }
   const r=getR(id);
   trackEvent(wasAdding?'add_favourite':'remove_favourite',{recipe_id:id,recipe_name:r?r.meal:'',total_favourites:favs.size});
   saveFavs();render();
@@ -832,9 +845,36 @@ function favHeart(id,size,cls){
   return `<button class="fav-btn ${cls||""} ${active?"active":""}" onclick="toggleFav(${id},event)" title="${active?"Remove from favourites":"Add to favourites"}">${active?"❤️":"🤍"}</button>`;
 }
 
+// ── Dislikes ──
+function loadDislikes(){
+  try{const raw=localStorage.getItem("mealplan-dislikes");if(raw)dislikes=new Set(JSON.parse(raw));}catch{}
+}
+function saveDislikes(){
+  try{localStorage.setItem("mealplan-dislikes",JSON.stringify([...dislikes]));}catch{}
+}
+function toggleDislike(id,e){
+  if(e){e.stopPropagation();e.preventDefault();}
+  const wasAdding=!dislikes.has(id);
+  if(dislikes.has(id))dislikes.delete(id);else dislikes.add(id);
+  // If adding to dislikes, remove from favourites
+  if(wasAdding && favs.has(id)){
+    favs.delete(id);
+    saveFavs();
+  }
+  const r=getR(id);
+  trackEvent(wasAdding?'add_dislike':'remove_dislike',{recipe_id:id,recipe_name:r?r.meal:'',total_dislikes:dislikes.size});
+  saveDislikes();render();
+}
+function isDisliked(id){return dislikes.has(id);}
+function dislikeBtn(id,cls){
+  const active=isDisliked(id);
+  return `<button class="dislike-btn ${cls||""} ${active?"active":""}" onclick="toggleDislike(${id},event)" title="${active?"Remove from dislikes":"I don't like this"}">${active?"👎":"👎🏻"}</button>`;
+}
+
 // ── Storage ──
 function loadPlan(){
   loadFavs();
+  loadDislikes();
   loadChecked();
   try{
     const raw=localStorage.getItem("mealplan-v7");
@@ -851,10 +891,11 @@ function loadPlan(){
 
 function generatePlan(cycle){
   const now=new Date();
-  // Build weighted pool: favourites appear 3x more often, exclude puddings from main meals
+  // Build weighted pool: favourites appear 3x more often, exclude puddings and dislikes from main meals
   let pool=[];
   R.forEach(r=>{
     if(r.cat==="Pudding") return; // Exclude puddings from dinner rotation
+    if(dislikes.has(r.id)) return; // Exclude disliked recipes
     pool.push(r);
     if(favs.has(r.id)){pool.push(r);pool.push(r);}
   });
@@ -932,8 +973,12 @@ function swapRandom(dateStr){
   document.querySelectorAll('.swap-menu').forEach(m=>m.remove());
   const cur=plan.find(p=>p.date===dateStr);
   const used=plan.map(p=>p.recipeId);
-  const avail=R.filter(r=>r.cat!=="Pudding"&&!used.includes(r.id));
-  const pool=avail.length?avail:R.filter(r=>r.cat!=="Pudding"&&r.id!==cur.recipeId);
+  const avail=R.filter(r=>r.cat!=="Pudding"&&!dislikes.has(r.id)&&!used.includes(r.id));
+  const pool=avail.length?avail:R.filter(r=>r.cat!=="Pudding"&&!dislikes.has(r.id)&&r.id!==cur.recipeId);
+  if(pool.length===0){
+    alert("No available recipes! Try removing some from your dislikes.");
+    return;
+  }
   cur.recipeId=pool[Math.floor(Math.random()*pool.length)].id;
   savePlan(); render();
 }
@@ -1251,23 +1296,24 @@ function renderCycle(){
 
 let dbFilter="All", dbSearch="";
 function renderRecipes(){
-  const cats=["All","Favourites",...[...new Set(R.map(r=>r.cat))]];
+  const cats=["All","Favourites","Disliked",...[...new Set(R.map(r=>r.cat))]];
   const filtered=R.filter(r=>{
-    const matchCat=dbFilter==="All"||dbFilter==="Favourites"?true:r.cat===dbFilter;
+    const matchCat=dbFilter==="All"||dbFilter==="Favourites"||dbFilter==="Disliked"?true:r.cat===dbFilter;
     const matchFav=dbFilter==="Favourites"?isFav(r.id):true;
+    const matchDislike=dbFilter==="Disliked"?isDisliked(r.id):true;
     const ms=!dbSearch||r.meal.toLowerCase().includes(dbSearch.toLowerCase())||r.desc.toLowerCase().includes(dbSearch.toLowerCase());
-    return matchCat&&matchFav&&ms;
+    return matchCat&&matchFav&&matchDislike&&ms;
   });
   let h=`<div class="db-header">
     <div><h2 style="font-family:var(--serif);font-size:1.5rem">Recipe Database</h2>
-      <p style="font-size:.85rem;color:var(--muted)">${R.length} recipes · ${favs.size} favourited · All prawn & coconut free</p></div>
+      <p style="font-size:.85rem;color:var(--muted)">${R.length} recipes · ${favs.size} favourited · ${dislikes.size} disliked</p></div>
     <input class="db-search" placeholder="Search recipes..." value="${dbSearch}" oninput="dbSearch=this.value;renderRecipes();">
   </div>
   <div class="db-filters">`;
   cats.forEach(c=>{
     const active=dbFilter===c;
-    const col=c==="Favourites"?"#E74C3C":(CAT_COL[c]||"#D4603A");
-    const label=c==="All"?"🍽 All":c==="Favourites"?`❤️ Favourites (${favs.size})`:(CAT_EMOJI[c]||"")+" "+c;
+    const col=c==="Favourites"?"#E74C3C":c==="Disliked"?"#6B7280":(CAT_COL[c]||"#D4603A");
+    const label=c==="All"?"🍽 All":c==="Favourites"?`❤️ Favourites (${favs.size})`:c==="Disliked"?`👎 Disliked (${dislikes.size})`:(CAT_EMOJI[c]||"")+" "+c;
     h+=`<button class="db-filter-btn${active?" active":""}" style="${active?`background:${col};border-color:${col}`:""}" onclick="dbFilter='${c}';renderRecipes();">${label}</button>`;
   });
   h+=`</div><div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">`;
@@ -1278,15 +1324,16 @@ function renderRecipes(){
       adCounter++;
       h+=`<div style="grid-column:1/-1">${inlineAdHTML(adCounter)}</div>`;
     }
-    h+=`<div class="mini-card" onclick="openRecipe(${r.id})">
+    const disliked=isDisliked(r.id);
+    h+=`<div class="mini-card${disliked?' disliked':''}" onclick="openRecipe(${r.id})">
       <div class="mini-top"><span class="mini-cat" style="color:${CAT_COL[r.cat]||"#D4603A"}">${CAT_EMOJI[r.cat]||""} ${r.cat}</span>
-        <div style="display:flex;align-items:center;gap:6px">${favHeart(r.id)}<span class="diff-tag diff-${r.diff.toLowerCase()}">${r.diff}</span></div></div>
-      <div class="mini-title">${r.meal}${isFav(r.id)?'<span class="fav-indicator">❤️</span>':''}</div>
+        <div style="display:flex;align-items:center;gap:4px">${dislikeBtn(r.id)}${favHeart(r.id)}<span class="diff-tag diff-${r.diff.toLowerCase()}">${r.diff}</span></div></div>
+      <div class="mini-title">${r.meal}${isFav(r.id)?'<span class="fav-indicator">❤️</span>':''}${disliked?'<span class="dislike-indicator">👎</span>':''}</div>
       <div class="mini-desc">${r.desc}</div>
       <div class="mini-time">⏱ ${r.time}</div>
     </div>`;
   });
-  if(!filtered.length) h+=`<p style="text-align:center;color:var(--light);padding:40px;grid-column:1/-1">${dbFilter==="Favourites"?"No favourites yet — tap ❤️ on any recipe to add it!":"No recipes match your search."}</p>`;
+  if(!filtered.length) h+=`<p style="text-align:center;color:var(--light);padding:40px;grid-column:1/-1">${dbFilter==="Favourites"?"No favourites yet — tap ❤️ on any recipe to add it!":dbFilter==="Disliked"?"No disliked recipes — tap 👎 to hide recipes you don't want.":"No recipes match your search."}</p>`;
   h+=`</div>`;
   $("main").innerHTML=h;
   pushInlineAds();
@@ -2004,10 +2051,11 @@ function openSyncModal(){
 
 function generateSyncCode(){
   const data = {
-    v: 1, // version
+    v: 2, // version - bumped to include dislikes
     m: meta,
     p: plan,
     f: [...favs],
+    d: [...dislikes], // dislikes
     c: checkedItems ? [...checkedItems] : [],
     pr: priceOverrides || {}
   };
@@ -2054,12 +2102,14 @@ function importSyncCode(){
     meta = data.m;
     plan = data.p;
     favs = new Set(data.f || []);
+    dislikes = new Set(data.d || []); // Import dislikes
     if(data.c) checkedItems = new Set(data.c);
     if(data.pr) priceOverrides = data.pr;
     
     // Save everything
     savePlan();
     saveFavs();
+    saveDislikes();
     saveChecked();
     savePriceOverrides();
     
